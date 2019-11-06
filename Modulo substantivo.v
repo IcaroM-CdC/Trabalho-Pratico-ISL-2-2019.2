@@ -10,8 +10,11 @@ module substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A;
     reg Tom, Ready, clk, Reset, End;
 
 
+    // O circuito atualizará na borda de subida "Positive edge"
     always@(posedge clk) begin
 
+        // Se o reset tiver o valor 1, o circuito resetará
+        // OBS: Para o circuito funcionar de forma correta, é nescessario o resetar antes do uso
         if (Reset == 1'b1) begin
 
             clk <= 1'b1;
@@ -25,6 +28,7 @@ module substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A;
             
         end
 
+        // Caso o reset contenha o valor 0, o algoritmo terá prosseguimento
         else begin
 
             if (Ready == 1'b1) begin
@@ -33,13 +37,14 @@ module substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A;
                 Nota <= Nota_in;            
 
 
-                // Verifica se é uma letra inválida, caso sim o algoritmo analisa a entrada anterior
+                // Verifica se é uma letra inválida, caso sim o algoritmo analisa a entrada "anterior"
                 if ((Tom == 1'b0 && Nota == 3'b000) || (Tom == 1'b1 && Nota == 3'b000)) begin
                     
+                    // Como a entrada é uma letra inválida, como especificado a palavra será encerrada
                     Ready <= 1'b0;
                     End <= 1'b1;
                     
-                    // Verifica a entrada anterior é uma letra válida, caso sim informa qual substantivo é
+                    // Verifica a entrada "anterior" é uma letra válida, caso sim informa qual substantivo é
                     if ((Tom_A != 1'b0 && Nota_A != 3'b000) || (Tom_A != 1'b1 && Nota_A != 3'b000)) begin
                         
                         if (Tom_A == 1'b0 && Nota_A == 3'b011) begin
@@ -69,6 +74,7 @@ module substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A;
                     end
 
                     // Se a entrada anterior for inválida, se trata de uma palavra inválida
+                    // Porque tanto a entrada atual quanto a anterior são inválidas
                     else begin
                         
                         Tipo <= 2'b00;
