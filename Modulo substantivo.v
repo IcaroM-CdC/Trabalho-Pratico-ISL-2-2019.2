@@ -1,11 +1,11 @@
-module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A, Saida);
+module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_anterior, Tom_anterior, Saida);
 
 
     output reg [6:0] Saida;
 	output reg [1:0] Tipo;
-    output reg [2:0] Nota_A;
+    output reg [2:0] Nota_anterior;
     output reg [2:0] Nota;
-    output reg Tom, Ready, clk, Reset, End, Tom_A;
+    output reg Tom, Ready, clk, Reset, End, Tom_anterior;
 	 
 
 
@@ -22,8 +22,8 @@ module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A, Said
             Ready <= 1'b0;
             End <= 1'b0;
             Tipo <= 2'b00;
-            Tom_A <= 1'b0;
-            Nota_A <= 1'b000;
+            Tom_anterior <= 1'b0;
+            Nota_anterior <= 1'b000;
             
         end
 
@@ -33,7 +33,8 @@ module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A, Said
 
             if (Ready == 1'b1) begin
 
-               
+                // Mostra no display de 7 segmentos qual é a letra introduzida no FPGA
+
                 Saida[6] = ~((~Nota[2] & Nota[0]) | (Nota[1] & ~Nota[0]) | (Tom & Nota[2] & ~Nota[1])); 
 	            Saida[5] = ~((~Nota[2] & Nota[1] & ~Nota[0]) | (Nota[2] & Nota[1] & Tom) | (Nota[2] & Nota[1] & Nota[0]) | (Nota[2] & Nota[0] & Nota[1]) | (Nota[2] & ~Nota[1] & ~Nota[0] & ~Tom) | (~Nota[2] & ~Nota[1] & Nota[0] & ~Tom));
     	        Saida[4] = ~((Nota[1] & Nota[0]) | (~Tom & ~Nota[2] & Nota[1]) | (Nota[2] & ~Nota[1] & ~Nota[0]) | (Tom & Nota[2] & ~Nota[1]));
@@ -51,21 +52,21 @@ module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A, Said
                     End <= 1'b1;
                     
                     // Verifica a entrada "anterior" é uma letra válida, caso sim informa qual substantivo é
-                    if ((Tom_A != 1'b0 && Nota_A != 3'b000) || (Tom_A != 1'b1 && Nota_A != 3'b000)) begin
+                    if ((Tom_anterior != 1'b0 && Nota_anterior != 3'b000) || (Tom_anterior != 1'b1 && Nota_anterior != 3'b000)) begin
                         
-                        if (Tom_A == 1'b0 && Nota_A == 3'b011) begin
+                        if (Tom_anterior == 1'b0 && Nota_anterior == 3'b011) begin
 
                             Tipo <= 2'b11;
 
                         end
                     
-                        if (Tom_A == 1'b0 && Nota_A == 3'b100) begin
+                        if (Tom_anterior == 1'b0 && Nota_anterior == 3'b100) begin
 
                             Tipo <= 2'b10;
    
                         end
 
-                        if (Tom_A == 1'b0 && Nota_A == 3'b101) begin
+                        if (Tom_anterior == 1'b0 && Nota_anterior == 3'b101) begin
                         
                             Tipo <= 2'b01;
              
@@ -95,30 +96,30 @@ module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A, Said
 
                     if (Tom == 1'b0 && Nota == 3'b011) begin
 
-                        Tom_A <= Tom;
-                        Nota_A <= Nota;
+                        Tom_anterior <= Tom;
+                        Nota_anterior <= Nota;
 
                     end
                     
                     if (Tom == 1'b0 && Nota == 3'b100) begin
 
-                        Tom_A <= Tom;
-                        Nota_A <= Nota;
+                        Tom_anterior <= Tom;
+                        Nota_anterior <= Nota;
    
                     end
 
                     if (Tom == 1'b0 && Nota == 3'b101) begin
                         
-                        Tom_A <= Tom;
-                        Nota_A <= Nota;
+                        Tom_anterior <= Tom;
+                        Nota_anterior <= Nota;
              
                     end
 
                     // Se for uma letra válida mas diferente, o algoritmo retornará para o estado inicial
                     else begin
                         
-                        Tom_A <= Tom;
-                        Nota_A <= Nota;
+                        Tom_anterior <= Tom;
+                        Nota_anterior <= Nota;
 
                     end     
 
