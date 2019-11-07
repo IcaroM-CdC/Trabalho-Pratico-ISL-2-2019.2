@@ -1,22 +1,21 @@
-module substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A;
+module Substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A, Saida);
 
-    input wire [2:0] Nota_in;
-    input wire Tom_in;
-    output wire [1:0] Tipo;
 
-    reg Tom_A;
-    reg [2:0] Nota_A;
-    reg [2:0] Nota;
-    reg Tom, Ready, clk, Reset, End;
+    output reg [6:0] Saida;
+	output reg [1:0] Tipo;
+    output reg [2:0] Nota_A;
+    output reg [2:0] Nota;
+    output reg Tom, Ready, clk, Reset, End, Tom_A;
+	 
 
 
     // O circuito atualizará na borda de subida "Positive edge"
     always@(posedge clk) begin
-
+		  
         // Se o reset tiver o valor 1, o circuito resetará
         // OBS: Para o circuito funcionar de forma correta, é nescessario o resetar antes do uso
         if (Reset == 1'b1) begin
-
+				
             clk <= 1'b1;
             Tom <= 1'b0;
             Nota <= 3'b000;
@@ -29,13 +28,20 @@ module substantivo (clk, Reset, Ready, Tom, Nota, End, Tipo, Nota_A, Tom_A;
         end
 
         // Caso o reset contenha o valor 0, o algoritmo terá prosseguimento
-        else begin
+        
+		  else begin
 
             if (Ready == 1'b1) begin
 
-                Tom <= Tom_in;
-                Nota <= Nota_in;            
-
+               
+                Saida[6] = ~((~Nota[2] & Nota[0]) | (Nota[1] & ~Nota[0]) | (Tom & Nota[2] & ~Nota[1])); 
+	            Saida[5] = ~((~Nota[2] & Nota[1] & ~Nota[0]) | (Nota[2] & Nota[1] & Tom) | (Nota[2] & Nota[1] & Nota[0]) | (Nota[2] & Nota[0] & Nota[1]) | (Nota[2] & ~Nota[1] & ~Nota[0] & ~Tom) | (~Nota[2] & ~Nota[1] & Nota[0] & ~Tom));
+    	        Saida[4] = ~((Nota[1] & Nota[0]) | (~Tom & ~Nota[2] & Nota[1]) | (Nota[2] & ~Nota[1] & ~Nota[0]) | (Tom & Nota[2] & ~Nota[1]));
+    	        Saida[3] = ~((Nota[1] & Tom) | (Nota[2] & Tom) | (Nota[2] & Nota[1] & ~Nota[0]));
+    	        Saida[2] = ~((Nota[0] & ~Tom) | (~Nota[2] & ~Nota[1] & Nota[0]) | (Nota[2] & ~Nota[1] & ~Nota[0])); 
+    	        Saida[1] = ~((~Nota[2] & Nota[1] & ~Nota[0]) | (~Tom & Nota[2] & ~Nota[1]) | (Tom & ~Nota[1] & Nota[0]) | (Tom & Nota[2] & Nota[0]));
+    	        Saida[0] = ~((Nota[0] & ~Tom) | (Nota[2] & ~Tom) | (Nota[1] & ~Tom));
+	 
 
                 // Verifica se é uma letra inválida, caso sim o algoritmo analisa a entrada "anterior"
                 if ((Tom == 1'b0 && Nota == 3'b000) || (Tom == 1'b1 && Nota == 3'b000)) begin
